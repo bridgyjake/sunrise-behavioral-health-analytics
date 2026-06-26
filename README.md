@@ -179,18 +179,27 @@ sunrise-behavioral-health-analytics/
 
 ## How to Run
 
-1. Install MySQL 8.0 and MySQL Workbench.
-2. Create a new database:
+1. Clone this repository or download the project files.
+
+2. Open MySQL Workbench and create a new database:
 
 ```sql
 CREATE DATABASE sunrise_bh_v4;
 ```
 
-3. Run `data/sunrise_behavioral_health_v4_mysql.sql` to load the raw tables.
-4. Execute `sql/01_staging_tables.sql` to build the staging layer.
-5. Execute `sql/02_data_validation.sql` to reproduce the data quality assessment.
-6. Execute `sql/03_business_analysis.sql` to reproduce all analytical findings.
+3. Select the new database:
 
+```sql
+USE sunrise_bh_v4;
+```
+
+4. Execute `data/sunrise_behavioral_health_v4_mysql.sql` to create and populate the raw source tables.
+
+5. Execute `sql/01_staging_tables.sql` to build the cleaned and standardized staging tables.
+
+6. Execute `sql/02_data_validation.sql` to reproduce the documented data quality assessment.
+
+7. Execute `sql/03_business_analysis.sql` to reproduce the analytical findings presented in this project.
 ---
 
 ## Future Work

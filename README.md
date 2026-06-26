@@ -219,3 +219,4 @@ This project combines technical SQL skills with domain expertise in behavioral h
 **Currently pursuing Healthcare Data Analyst, Business Intelligence Analyst, and Epic Clarity Analyst opportunities.**
 
 Feel free to connect or reach out with feedback.
+linkedin.com/in/jakob-bridgman-514615397/

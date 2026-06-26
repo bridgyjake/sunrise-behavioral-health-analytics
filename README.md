@@ -1,4 +1,4 @@
-# Sunrise Behavioral Health Clinic — SQL Analytics Project
+# Sunrise Behavioral Health Analytics | End-to-End SQL Data Analysis
 
 ## Overview
 

@@ -2,9 +2,9 @@
 
 ## Overview
 
-This project presents a full end-to-end SQL analytics investigation of a behavioral health clinic's operational and financial performance from 2021 to 2024. The dataset was purpose-built to mirror the relational schema of a real behavioral health EMR system, incorporating realistic ICD-10 diagnosis coding, insurance payer mix, provider caseload structures, and clinical workflows drawn from 3 years of direct behavioral health experience.
+This project presents a full end-to-end SQL analytics investigation of a behavioral health clinic's operational and financial performance from 2021 to 2024. The dataset was purpose-built to mirror the relational schema of a real behavioral health EMR system, incorporating realistic ICD-10 diagnosis coding, insurance payer mix, provider caseload structures, and clinical workflows drawn from three years of direct behavioral health experience.
 
-The analysis follows the complete data analyst workflow: raw data ingestion, data quality assessment, staging layer construction, and multi-dimensional analytical querying — culminating in actionable findings for clinic leadership.
+The analysis follows the complete data analyst workflow: raw data ingestion, data quality assessment, staging layer construction, and multi-dimensional analytical querying—culminating in actionable findings for clinic leadership.
 
 The project demonstrates production-style SQL using Common Table Expressions (CTEs), window functions, multi-table joins, data validation, staging tables, and business-focused analytical reporting.
 
@@ -29,7 +29,7 @@ A behavioral health clinic experienced significant revenue and operational shift
 - What drove the revenue decline between 2022 and 2023?
 - Which providers are performing efficiently, and which represent operational risk?
 - Are patients being retained year-over-year, or is the clinic losing its existing base?
-- What is driving patient discharges — clinical completion or external factors like insurance denial?
+- What is driving patient discharges—clinical completion or external factors like insurance denial?
 - Which patient populations represent the highest utilization and financial risk?
 
 ---
@@ -59,9 +59,9 @@ A behavioral health clinic experienced significant revenue and operational shift
 
 ## Data Architecture
 
-This project implements a two-layer architecture mirroring production analytics engineering practices.
+This project implements a two-layer architecture that mirrors common analytics engineering practices.
 
-**Raw Layer** — Source tables loaded directly from the EMR export and preserved without modification. All data quality issues are documented but never deleted.
+**Raw Layer** — Source tables are loaded directly from the simulated EMR export and preserved without modification. Data quality issues are documented but never removed from the original source tables.
 
 **Staging Layer** — Cleaned and standardized tables used for all downstream analysis.
 
@@ -69,7 +69,7 @@ This project implements a two-layer architecture mirroring production analytics 
 - `stg_encounters` — NULL provider IDs, invalid dates, and duplicate encounters removed
 - `stg_billing` — Overpaid records and orphaned billing entries removed
 
-This approach preserves raw data for auditability while maintaining analytical accuracy. The same Raw → Staging pattern is expanded into a dbt analytics engineering workflow in Portfolio Project 3.
+This approach preserves the original source data for auditability while ensuring all business analysis is performed against clean, standardized staging tables. Separating raw and transformed data creates a reproducible analytical workflow while reflecting practices commonly used in modern analytics environments.
 
 ### Entity Relationship Diagram
 
@@ -195,12 +195,12 @@ CREATE DATABASE sunrise_bh_v4;
 
 ## Future Work
 
-This project serves as the foundation for two additional portfolio projects built on the same healthcare dataset.
+Planned enhancements to this project include:
 
 - **Power BI Executive Dashboard** — Interactive dashboards for clinic leadership featuring operational, financial, and provider performance KPIs.
 - **Python + dbt Analytics Pipeline** — Automated data ingestion, transformation, testing, and documentation using modern analytics engineering practices.
 
-Together, these three projects demonstrate the complete analytics lifecycle—from raw data ingestion through business intelligence reporting.
+These enhancements will expand this project into a complete end-to-end analytics portfolio demonstrating data engineering, business intelligence, and analytics workflows.
 
 ---
 
@@ -216,7 +216,10 @@ Built by **Jakob Bridgman**, a behavioral health professional with three years o
 
 This project combines technical SQL skills with domain expertise in behavioral health operations, revenue cycle management, and clinical workflow analysis.
 
+It reflects my approach to analytics: understanding the business context first, ensuring data quality, and communicating findings that support informed decision-making.
+
 **Currently pursuing Healthcare Data Analyst, Business Intelligence Analyst, and Epic Clarity Analyst opportunities.**
 
 Feel free to connect or reach out with feedback.
-linkedin.com/in/jakob-bridgman-514615397/
+
+**LinkedIn:** https://www.linkedin.com/in/jakob-bridgman-514615397/

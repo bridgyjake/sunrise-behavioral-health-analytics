@@ -50,7 +50,7 @@ This approach ensures raw data auditability while maintaining analytical accurac
 
 ### Entity Relationship Diagram
 
-![ERD](schema_erd.png)
+![Entity Relationship Diagram](images/schema_erd.png)
 
 ---
 
@@ -67,7 +67,8 @@ Six categories of data quality issues were identified and documented prior to an
 | Orphaned billing records | 5 | Partial migration — billing records with no matching encounter | Excluded from all revenue analysis |
 | Inconsistent city formatting | 20 | Manual entry — mixed case, extra spaces, abbreviations | Standardized in stg_patients using UPPER(TRIM(REPLACE())) |
 
-Full validation queries are available in `data_validation.sql`.
+Full validation queries are available in
+[`sql/02_data_validation.sql`](sql/02_data_validation.sql).
 
 ---
 
@@ -124,15 +125,16 @@ Patients more than 1.5 standard deviations above average encounter count skew he
 
 ```
 sunrise-behavioral-health-analytics/
+│
 ├── README.md
-├── schema_erd.png
-├── data/
-│   └── sunrise_behavioral_health_v4_mysql.sql
-├── sql/
-│   ├── 01_staging_tables.sql
-│   ├── 02_data_validation.sql
-│   └── 03_analytical_queries.sql
-```
+│
+├── images/
+│   └── schema_erd.png
+│
+└── sql/
+    ├── 01_staging_tables.sql
+    ├── 02_data_validation.sql
+    └── 03_business_analysis.sql
 
 ---
 

@@ -6,6 +6,20 @@ This project presents a full end-to-end SQL analytics investigation of a behavio
 
 The analysis follows the complete data analyst workflow: raw data ingestion, data quality assessment, staging layer construction, and multi-dimensional analytical querying — culminating in actionable findings for clinic leadership.
 
+The project demonstrates production-style SQL using Common Table Expressions (CTEs), window functions, multi-table joins, data validation, staging tables, and business-focused analytical reporting.
+
+---
+
+## Project Snapshot
+
+- 🏥 Behavioral Health Clinic Analytics
+- 📊 5 relational tables
+- 👥 150 patients
+- 🩺 2,233 encounters
+- 💰 2,234 billing records
+- 📅 January 2021 – June 2024
+- 🛠️ MySQL 8.0 & MySQL Workbench
+
 ---
 
 ## Business Problem
@@ -23,30 +37,39 @@ A behavioral health clinic experienced significant revenue and operational shift
 ## Dataset
 
 | Table | Rows | Description |
-|---|---|---|
-| patients | 150 | Demographics, insurance, referral source, intake/discharge info |
+|---|---:|---|
+| patients | 150 | Demographics, insurance, referral source, intake/discharge information |
 | providers | 10 | Provider role, specialty, department, hire date |
-| encounters | 2,233 | Individual patient visits with provider, date, type, and show status |
+| encounters | 2,233 | Individual patient visits with provider, date, type, and attendance status |
 | billing | 2,234 | Billing records with amount billed, amount paid, and payment status |
 | diagnoses | 300 | Patient ICD-10 diagnosis codes |
 
-**Date range:** January 2021 – June 2024  
-**Tools:** MySQL 8.0, MySQL Workbench
+**Date Range:** January 2021 – June 2024
+
+---
+
+## Technologies
+
+- MySQL 8.0
+- MySQL Workbench
+- Git
+- GitHub
 
 ---
 
 ## Data Architecture
 
-This project implements a two-layer architecture mirroring production analytics engineering practices:
+This project implements a two-layer architecture mirroring production analytics engineering practices.
 
-**Raw Layer** — source tables loaded directly from the EMR export, preserved without modification. All data quality issues are documented but not deleted.
+**Raw Layer** — Source tables loaded directly from the EMR export and preserved without modification. All data quality issues are documented but never deleted.
 
-**Staging Layer** — cleaned and standardized versions used for all analysis:
-- `stg_patients` — city names standardized with `UPPER(TRIM(REPLACE()))`
-- `stg_encounters` — NULL provider_ids, date violations, and duplicate records removed
-- `stg_billing` — overpaid records and orphaned billing entries removed
+**Staging Layer** — Cleaned and standardized tables used for all downstream analysis.
 
-This approach ensures raw data auditability while maintaining analytical accuracy. The same raw → staging pattern is formalized with dbt in Portfolio Project 3.
+- `stg_patients` — City names standardized using `UPPER(TRIM(REPLACE()))`
+- `stg_encounters` — NULL provider IDs, invalid dates, and duplicate encounters removed
+- `stg_billing` — Overpaid records and orphaned billing entries removed
+
+This approach preserves raw data for auditability while maintaining analytical accuracy. The same Raw → Staging pattern is expanded into a dbt analytics engineering workflow in Portfolio Project 3.
 
 ### Entity Relationship Diagram
 
@@ -56,74 +79,86 @@ This approach ensures raw data auditability while maintaining analytical accurac
 
 ## Data Quality Assessment
 
-Six categories of data quality issues were identified and documented prior to analysis:
+Six categories of data quality issues were identified and documented before any business analysis was performed.
 
 | Issue | Count | Root Cause | Resolution |
-|---|---|---|---|
+|---|---:|---|---|
 | NULL provider_id in encounters | 10 | Staff transition — encounters logged before provider assignment | Excluded from provider-level analysis |
-| visit_date before intake_date | 5 | Data entry errors — incorrect date logged | Excluded from date-range analysis |
-| Duplicate encounter records | 4 | EMR system import errors — same encounter logged twice | Retained lowest encounter_id as canonical record |
-| amount_paid > amount_billed | 6 | Data entry or system calculation error — physically impossible | Excluded from revenue analysis |
-| Orphaned billing records | 5 | Partial migration — billing records with no matching encounter | Excluded from all revenue analysis |
-| Inconsistent city formatting | 20 | Manual entry — mixed case, extra spaces, abbreviations | Standardized in stg_patients using UPPER(TRIM(REPLACE())) |
+| visit_date before intake_date | 5 | Data entry errors | Excluded from date-range analysis |
+| Duplicate encounter records | 4 | EMR import duplication | Retained lowest encounter_id as canonical record |
+| amount_paid > amount_billed | 6 | Data entry/system calculation error | Excluded from revenue analysis |
+| Orphaned billing records | 5 | Partial data migration | Excluded from revenue analysis |
+| Inconsistent city formatting | 20 | Manual entry inconsistencies | Standardized using `UPPER(TRIM(REPLACE()))` |
 
-Full validation queries are available in
-[`sql/02_data_validation.sql`](sql/02_data_validation.sql).
+Full validation queries are available in [`sql/02_data_validation.sql`](sql/02_data_validation.sql).
 
 ---
 
 ## Key Findings
 
-**1. Clinic-wide revenue declined 26% between 2022 and 2023**  
-Total revenue fell from $79,637 in 2022 to $58,818 in 2023, with encounter volume declining 17% over the same period. The back half of 2023 generated roughly half the monthly revenue of the front half, suggesting an accelerating decline rather than a gradual shift.
+The following findings were produced using analytical SQL queries executed against the cleaned staging layer.
 
-**2. Private insurance revenue decline drove the largest absolute loss**  
-All three payer types declined in 2023, but Private insurance fell $12,323 (33.1%) — the largest absolute dollar loss. Since Private generates the highest revenue per encounter, losing Private patients amplified the financial impact beyond what encounter volume alone would suggest.
+### 1. Clinic-wide revenue declined 26% between 2022 and 2023
 
-**3. Insurance Denial is the second leading discharge reason**  
-Of 43 discharged patients, 10 (23.3%) were discharged due to insurance denial — the second leading reason after treatment completion (44.2%). This finding warrants review of medical necessity documentation practices and payer-specific denial patterns.
+Total revenue fell from **$79,637** in 2022 to **$58,818** in 2023 while encounter volume declined **17%** over the same period. Revenue during the second half of 2023 was roughly half that of the first half, suggesting an accelerating decline rather than a gradual slowdown.
 
-**4. Michael Okafor represents a significant operational risk**  
-Okafor has the highest no-show rate of any active provider (48.3%) combined with the lowest revenue per encounter ($47.57). His Substance Use specialization likely contributes to both — substance use patients have higher no-show rates and Medi-Cal (which dominates his caseload) reimburses at lower rates. Two compounding problems with no current mitigation in the data.
+### 2. Private insurance revenue experienced the largest financial decline
 
-**5. Two providers account for 62.6% of total 2023 revenue**  
-David Schwartz ($12,486) and Elena Vasquez ($18,459) together generated $30,945 of $49,341 in total provider revenue for 2023. This concentration represents significant financial risk if either provider were to leave.
+Although revenue decreased across every payer type, Private insurance generated the largest absolute loss (**$12,323**, or **33.1%**). Because Private insurance also produced the highest revenue per encounter, the financial impact was disproportionately large.
 
-**6. Hospital Discharge referrals show the lowest no-show rate (16.4%)**  
-Referral source is a meaningful predictor of patient engagement. Hospital Discharge patients had the lowest no-show rate (16.4%) while Provider Referrals had the highest (28.3%), suggesting differentiated outreach protocols by referral channel could improve attendance rates clinic-wide.
+### 3. Insurance denial was the second leading discharge reason
 
-**7. 17 high utilizers identified — 47% are Medi-Cal patients**  
-Patients more than 1.5 standard deviations above average encounter count skew heavily toward Medi-Cal (47%), the lowest-reimbursing payer. The clinic's most resource-intensive patients are also its least financially sustainable — a structural cost-revenue imbalance worth flagging for leadership.
+Among 43 discharged patients, **23.3%** were discharged because of insurance denial, second only to treatment completion (**44.2%**). This suggests an opportunity to review medical necessity documentation and payer-specific denial trends.
+
+### 4. Michael Okafor represents a significant operational risk
+
+Michael Okafor recorded the highest no-show rate (**48.3%**) while generating the lowest revenue per encounter (**$47.57**). His Substance Use caseload and heavy Medi-Cal payer mix likely contribute to both operational and financial challenges.
+
+### 5. Two providers generated nearly two-thirds of clinic revenue
+
+David Schwartz and Elena Vasquez generated **62.6%** of all provider revenue during 2023. This level of revenue concentration represents a meaningful organizational risk if either provider were to leave.
+
+### 6. Hospital discharge referrals demonstrated the strongest patient engagement
+
+Hospital Discharge referrals produced the clinic's lowest no-show rate (**16.4%**), while Provider Referrals produced the highest (**28.3%**). Referral source appears to be a meaningful predictor of appointment adherence.
+
+### 7. High-utilization patients disproportionately rely on Medi-Cal
+
+Seventeen patients exceeded **1.5 standard deviations** above the average encounter count. Nearly half (**47%**) were covered by Medi-Cal, suggesting the clinic's most resource-intensive patients are also among its lowest reimbursing populations.
 
 ---
 
 ## Technical Skills Demonstrated
 
-**SQL Concepts:**
-- Multi-table JOINs (INNER, LEFT, anti-join pattern)
-- Common Table Expressions (single and chained)
-- Window functions: LAG, LEAD, RANK, DENSE_RANK, NTILE, SUM OVER, AVG OVER
-- Conditional aggregation (CASE WHEN inside COUNT/SUM)
-- Subqueries as denominators for percentage calculations
-- CROSS JOIN for single-row aggregate CTEs
-- Correlated subqueries in WHERE clauses
-- Date functions: YEAR(), MONTH(), DATEDIFF()
-- String functions: UPPER(), TRIM(), REPLACE(), CONCAT()
-- COALESCE for NULL handling
-- STDDEV() for statistical threshold analysis
-- Data validation queries (referential integrity, impossible values, duplicates)
+### SQL Concepts
 
-**Data Engineering Concepts:**
-- Raw → Staging layer architecture
-- CREATE TABLE AS SELECT for staging table construction
-- Data quality documentation and remediation
-- Non-destructive cleaning (raw data preserved, issues filtered in queries)
+- Multi-table JOINs (INNER and LEFT)
+- Common Table Expressions (CTEs)
+- Window Functions (`LAG`, `LEAD`, `RANK`, `DENSE_RANK`, `NTILE`, `SUM OVER`, `AVG OVER`)
+- Conditional Aggregation
+- Correlated Subqueries
+- CROSS JOIN
+- Date Functions
+- String Manipulation
+- COALESCE
+- Statistical Analysis using `STDDEV()`
+- Referential Integrity Validation
+- Duplicate Detection
+- Data Quality Assessment
+
+### Data Engineering Concepts
+
+- Raw → Staging architecture
+- CREATE TABLE AS SELECT
+- Non-destructive data cleaning
+- Data quality documentation
+- Reproducible analytical workflow
 
 ---
 
 ## Repository Structure
 
-```
+```text
 sunrise-behavioral-health-analytics/
 │
 ├── README.md
@@ -131,32 +166,56 @@ sunrise-behavioral-health-analytics/
 ├── images/
 │   └── schema_erd.png
 │
+├── data/
+│   └── sunrise_behavioral_health_v4_mysql.sql
+│
 └── sql/
     ├── 01_staging_tables.sql
     ├── 02_data_validation.sql
     └── 03_business_analysis.sql
+```
 
 ---
 
 ## How to Run
 
-1. Install MySQL 8.0 and MySQL Workbench
-2. Create a new schema: `CREATE DATABASE sunrise_bh_v4;`
-3. Run `data/sunrise_behavioral_health_v4_mysql.sql` to load raw tables
-4. Run `sql/01_staging_tables.sql` to build clean staging tables
-5. Run `sql/02_data_validation.sql` to reproduce data quality findings
-6. Run `sql/03_analytical_queries.sql` to reproduce all analytical results
+1. Install MySQL 8.0 and MySQL Workbench.
+2. Create a new database:
+
+```sql
+CREATE DATABASE sunrise_bh_v4;
+```
+
+3. Run `data/sunrise_behavioral_health_v4_mysql.sql` to load the raw tables.
+4. Execute `sql/01_staging_tables.sql` to build the staging layer.
+5. Execute `sql/02_data_validation.sql` to reproduce the data quality assessment.
+6. Execute `sql/03_business_analysis.sql` to reproduce all analytical findings.
+
+---
+
+## Future Work
+
+This project serves as the foundation for two additional portfolio projects built on the same healthcare dataset.
+
+- **Power BI Executive Dashboard** — Interactive dashboards for clinic leadership featuring operational, financial, and provider performance KPIs.
+- **Python + dbt Analytics Pipeline** — Automated data ingestion, transformation, testing, and documentation using modern analytics engineering practices.
+
+Together, these three projects demonstrate the complete analytics lifecycle—from raw data ingestion through business intelligence reporting.
 
 ---
 
 ## HIPAA Note
 
-This project uses entirely synthetic data generated to mirror realistic behavioral health EMR structures. No real patient data was used at any point. In a production environment, all patient PII would be replaced with de-identified patient IDs per HIPAA Safe Harbor guidelines prior to any analytical query.
+This project uses entirely synthetic data generated to mirror realistic behavioral health EMR structures. No real patient data was used at any point. In a production environment, all protected health information (PHI) would be replaced with de-identified patient identifiers following HIPAA Safe Harbor guidelines before any analytical work.
 
 ---
 
 ## About
 
-Built by Jake — behavioral health worker with 3 years of direct clinical experience transitioning into healthcare data analytics. This project reflects both technical SQL proficiency and domain-level understanding of behavioral health operations, billing workflows, and clinical outcome metrics.
+Built by **Jakob Bridgman**, a behavioral health professional with three years of direct clinical experience transitioning into healthcare data analytics.
 
-*Targeting Healthcare Data Analyst and Epic Clarity Analyst roles. Open to connecting.*
+This project combines technical SQL skills with domain expertise in behavioral health operations, revenue cycle management, and clinical workflow analysis.
+
+**Currently pursuing Healthcare Data Analyst, Business Intelligence Analyst, and Epic Clarity Analyst opportunities.**
+
+Feel free to connect or reach out with feedback.

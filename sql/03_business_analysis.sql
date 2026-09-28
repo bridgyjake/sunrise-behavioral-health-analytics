@@ -69,7 +69,7 @@ ORDER BY total_revenue DESC;
 
 -- Finding: Michael Okafor has the highest no-show rate (48.3%) AND
 -- lowest revenue per encounter ($47.57) — two compounding problems.
--- Schwartz and Vasquez generate 62.6% of total 2023 provider revenue.
+-- Schwartz and Vasquez generate 52.6% of total 2023 provider revenue ($30,946 of $58,818).
 
 
 -- ============================================

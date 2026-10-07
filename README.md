@@ -124,7 +124,7 @@ Among 43 discharged patients, **23.3%** were discharged because of insurance den
 
 ### 4. Michael Okafor represents a significant operational risk
 
-Michael Okafor recorded the highest no-show rate in 2023 (**48.3%**) while generating the lowest revenue per encounter (**$47.57**). His 87 no-shows cost an estimated **$8,010** in 2023. His Substance Use caseload and heavy Medi-Cal payer mix likely contribute to both operational and financial challenges.
+Michael Okafor recorded the highest no-show rate in 2023 (48.3%) while generating the lowest revenue per encounter ($47.57). His 87 no-shows cost an estimated $8,010 in 2023. Payer mix does not explain it: his panel is 45% Medi-Cal, about the same as David Schwartz's (46%, with a 4.5% no-show rate), and his no-show rate is above 40% with every payer. His Substance Use caseload is the next factor to test.
 
 ### 5. Two providers generated over half of clinic revenue
 
